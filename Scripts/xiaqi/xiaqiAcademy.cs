@@ -6,11 +6,14 @@ public class xiaqiAcademy : Academy
 {
     //-1代表黑棋，1代表白棋，0代表没有落子
     public int[,] qipanInfo = new int[10, 10];
-    //“black”表示现在是黑方，“white”表示现在是白方
-    public string blackorwhite = "";
-    //记录棋盘中棋子实体
-    public GameObject[] qizi = new GameObject[100];
 
+    //“black”表示现在是黑方，“white”表示现在是白方
+    public string blackorwhite = "black";
+
+    //记录棋盘中棋子实体
+    public GameObject[] qizis = new GameObject[100];
+
+    public int qizi_num = 0;
 
     public void qipanReset()
     {
@@ -21,9 +24,11 @@ public class xiaqiAcademy : Academy
                 this.qipanInfo[i, j] = 0;
             }
         }
-        foreach(GameObject g in this.qizi)
+        foreach(GameObject g in this.qizis)
         {
             Destroy(g);
         }
+        qizi_num = 0;
+        blackorwhite = "black";
     }
 }
