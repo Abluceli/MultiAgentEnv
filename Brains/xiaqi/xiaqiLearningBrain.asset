@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: xiaqiLearningBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 100
+    vectorObservationSize: 3481
     numStackedVectorObservations: 1
-    vectorActionSize: 0a0000000a000000
+    vectorActionSize: 3b0000003b000000
     cameraResolutions: []
     vectorActionDescriptions:
     - x
     - z
     vectorActionSpaceType: 0
-  model: {fileID: 5022602860645237092, guid: 46435384399e32645b29d3fa7d1824eb, type: 3}
-  inferenceDevice: 0
+  model: {fileID: 0}
+  inferenceDevice: 1
