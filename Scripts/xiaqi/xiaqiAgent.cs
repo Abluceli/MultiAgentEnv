@@ -35,87 +35,89 @@ public class xiaqiAgent : Agent
 
     public override void AgentAction(float[] vectorAction, string textAction)
     {
-        if(this.agentType == this.qipan.blackorwhite)
+        if (this.qipan.qizi_num == 100)
         {
-            int i = Mathf.FloorToInt(vectorAction[0]);
-            int j = Mathf.FloorToInt(vectorAction[1]);
-            if(this.qipan.qipanInfo[i,j] == 0)
+            Done();
+        }
+        else
+        {
+            if (this.agentType == this.qipan.blackorwhite)
             {
-                float x = -1, z = -1;
-                switch (i)
-                {
-                    case 0:
-                        x = 4.5f;
-                        break;
-                    case 1:
-                        x = 3.5f;
-                        break;
-                    case 2:
-                        x = 2.5f;
-                        break;
-                    case 3:
-                        x = 1.5f;
-                        break;
-                    case 4:
-                        x = 0.5f;
-                        break;
-                    case 5:
-                        x = -0.5f;
-                        break;
-                    case 6:
-                        x = -1.5f;
-                        break;
-                    case 7:
-                        x = -2.5f;
-                        break;
-                    case 8:
-                        x = -3.5f;
-                        break;
-                    case 9:
-                        x = -4.5f;
-                        break;
 
-                }
-                switch (j)
+                int i = Mathf.FloorToInt(vectorAction[0]);
+                int j = Mathf.FloorToInt(vectorAction[1]);
+                if (this.qipan.qipanInfo[i, j] == 0)
                 {
-                    case 0:
-                        z = 4.5f;
-                        break;
-                    case 1:
-                        z = 3.5f;
-                        break;
-                    case 2:
-                        z = 2.5f;
-                        break;
-                    case 3:
-                        z = 1.5f;
-                        break;
-                    case 4:
-                        z = 0.5f;
-                        break;
-                    case 5:
-                        z = -0.5f;
-                        break;
-                    case 6:
-                        z = -1.5f;
-                        break;
-                    case 7:
-                        z = -2.5f;
-                        break;
-                    case 8:
-                        z = -3.5f;
-                        break;
-                    case 9:
-                        z = -4.5f;
-                        break;
+                    float x = -1, z = -1;
+                    switch (i)
+                    {
+                        case 0:
+                            x = 4.5f;
+                            break;
+                        case 1:
+                            x = 3.5f;
+                            break;
+                        case 2:
+                            x = 2.5f;
+                            break;
+                        case 3:
+                            x = 1.5f;
+                            break;
+                        case 4:
+                            x = 0.5f;
+                            break;
+                        case 5:
+                            x = -0.5f;
+                            break;
+                        case 6:
+                            x = -1.5f;
+                            break;
+                        case 7:
+                            x = -2.5f;
+                            break;
+                        case 8:
+                            x = -3.5f;
+                            break;
+                        case 9:
+                            x = -4.5f;
+                            break;
 
-                }
-                if (this.qipan.qizi_num == 100)
-                {
-                    Done();
-                }
-                else
-                {
+                    }
+                    switch (j)
+                    {
+                        case 0:
+                            z = 4.5f;
+                            break;
+                        case 1:
+                            z = 3.5f;
+                            break;
+                        case 2:
+                            z = 2.5f;
+                            break;
+                        case 3:
+                            z = 1.5f;
+                            break;
+                        case 4:
+                            z = 0.5f;
+                            break;
+                        case 5:
+                            z = -0.5f;
+                            break;
+                        case 6:
+                            z = -1.5f;
+                            break;
+                        case 7:
+                            z = -2.5f;
+                            break;
+                        case 8:
+                            z = -3.5f;
+                            break;
+                        case 9:
+                            z = -4.5f;
+                            break;
+
+                    }
+                    
                     GameObject qizi;
                     if (this.agentType == "black")
                     {
@@ -125,6 +127,24 @@ public class xiaqiAgent : Agent
                         this.qipan.qizis[this.qipan.qizi_num] = qizi;
                         this.qipan.qizi_num++;
                         this.qipan.blackorwhite = "white";
+                        if (this.qipan.determine(i, j, -1))
+                        {
+                            
+                            AddReward(100f);
+                            Done();
+                        }
+                        else
+                        {
+                            if (this.qipan.qizi_num == 100)
+                            {
+                                AddReward(-10f);
+                                Done();
+                            }
+                            else
+                            {
+                                AddReward(-1f);
+                            } 
+                        }
 
                     }
                     else
@@ -135,22 +155,41 @@ public class xiaqiAgent : Agent
                         this.qipan.qizis[this.qipan.qizi_num] = qizi;
                         this.qipan.qizi_num++;
                         this.qipan.blackorwhite = "black";
+                        if (this.qipan.determine(i, j, 1))
+                        {
+
+                            AddReward(100f);
+                            Done();
+                        }
+                        else
+                        {
+                            if (this.qipan.qizi_num == 100)
+                            {
+                                AddReward(-10f);
+                                Done();
+                            }
+                            else
+                            {
+                                AddReward(-1f);
+                            }
+                        }
                     }
                 }
-
-                
-
-            }
-            else
-            {
-                this.AddReward(-0.1f);
+                else
+                {
+                    this.AddReward(-1f);
+                }
             }
         }
 
+         
+
         
         
+
+
     }
 
-
+    
 
 }
