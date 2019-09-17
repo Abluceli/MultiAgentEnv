@@ -9,29 +9,39 @@ using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 //treelet
 using System.Collections;
+using System.Collections.Generic;
 
 public class show_xiaqi : MonoBehaviour
 {
     //-1代表黑棋，1代表白棋，0代表没有落子
-    private int[,] qipanInfo = new int[59, 59];
+    private int[,] qipanInfo;
     private bool change = false;
     //private ArrayList[,] qipanInfo = new ArrayList[59, 59];
     //黑棋和白棋的对象，用于生成棋子
     public GameObject heiqi;
     public GameObject baiqi;
+    public GameObject x;
+    public GameObject z;
+    public Transform main_camera;
+    public Transform plane;
+
 
     private string self_ip = "58.199.160.185";
     private int myPort = 8888;
     private UdpClient recserver;
 
     //记录棋盘中棋子实体
-    public GameObject[] qizis = new GameObject[3481];
-    //记录期盼中棋子的个数
-    public int qizi_num = 0;
+    private List<GameObject> qizis = new List<GameObject>();
+
+    private List<GameObject> xzs = new List<GameObject>();
+
+    private int xz_rows;
+    private bool xz_change = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        
         this.startServer();
         
     }
@@ -39,38 +49,80 @@ public class show_xiaqi : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(this.change)
-        {
-            drawQiPan();
-        }
+        drawQiPan();
+        
     }
     public void drawQiPan()
     {
-        if(this.change)
+        if (xz_change)
+        {
+            main_camera.position = new Vector3(xz_rows / 2, xz_rows, xz_rows / 2);
+            plane.position = new Vector3(xz_rows / 2, 0, xz_rows / 2);
+            plane.localScale = new Vector3(xz_rows / 10f, 1, xz_rows / 10f);
+            foreach (GameObject g in this.xzs)
+            {
+                DestroyImmediate(g);
+            }
+            
+            GameObject xz = null;
+            for (int i = 0; i < xz_rows; i++)
+            {
+                xz = Instantiate(x);
+                if (xz_rows % 2 == 1)
+                {
+                    xz.transform.position = new Vector3((xz_rows - 1) / 2, 0, i);
+                    xz.transform.localScale = new Vector3(xz_rows - 1, 0.2f, 0.1f);
+                    xzs.Add(xz);
+                }
+                else
+                {
+                    xz.transform.position = new Vector3((xz_rows - 1) / 2f, 0, i);
+                    xz.transform.localScale = new Vector3(xz_rows - 1, 0.2f, 0.1f);
+                    xzs.Add(xz);
+                }
+
+
+            }
+            for (int i = 0; i < xz_rows; i++)
+            {
+                xz = Instantiate(z);
+                if (xz_rows % 2 == 1)
+                {
+                    xz.transform.position = new Vector3(i, 0, (xz_rows - 1) / 2);
+                    xz.transform.localScale = new Vector3(0.1f, 0.2f, xz_rows - 1);
+                    xzs.Add(xz);
+                }
+                else
+                {
+                    xz.transform.position = new Vector3(i, 0, (xz_rows - 1) / 2f);
+                    xz.transform.localScale = new Vector3(0.1f, 0.2f, xz_rows - 1);
+                    xzs.Add(xz);
+                }
+            }
+        }
+        if(change)
         {
             foreach (GameObject g in this.qizis)
             {
-                Destroy(g);
+                DestroyImmediate(g);
             }
-            qizi_num = 0;
-            for (int i = 0; i < 59; i++)
+            for (int i = 0; i < xz_rows; i++)
             {
-                for (int j = 0; j < 59; j++)
+                for (int j = 0; j < xz_rows; j++)
                 {
                     GameObject qizi = null;
-                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == -1)
+                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 0)
                     {
                         qizi = Instantiate(heiqi);
-                        qizis[qizi_num] = qizi;
-                        qizi_num++;
+                        qizis.Add(qizi);
+
                     }
                     if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 1)
                     {
                         qizi = Instantiate(baiqi);
-                        qizis[qizi_num] = qizi;
-                        qizi_num++;
+                        qizis.Add(qizi);
                     }
-                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 0)
+                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 2)
                     {
                         continue;
                     }
@@ -78,6 +130,8 @@ public class show_xiaqi : MonoBehaviour
                 }
             }
         }
+        
+        
         
     }
     public void startServer()
@@ -117,37 +171,27 @@ public class show_xiaqi : MonoBehaviour
 
             string message = Encoding.UTF8.GetString(buffer);
 
-            //= JsonConvert.DeserializeAnonymousType<int[,]>(message,new int[59,59]);
 
             //Treelet
-            int[,] Info = JsonConvert.DeserializeAnonymousType(message, new int[59, 59]);
+            int[,] Info = JsonConvert.DeserializeObject<int[,]>(message);
             //Treelet
-            for (int i = 0; i < 59; i++)
+
+            if (Info.GetLength(0) != this.xz_rows)
             {
-                for (int j = 0; j < 59; j++)
-                {
-                    if(Info[i,j] == this.qipanInfo[i,j])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        this.qipanInfo[i, j] = Info[i, j];
-                        this.change = true;
-                    }
-                }
+                this.xz_rows = Info.GetLength(0);
+                this.xz_change = true;
+                this.change = true;
+                qipanInfo = Info;
+            }
+            else
+            {
+                this.xz_change = false;
+                this.change = true;
+                qipanInfo = Info;
             }
 
-
-                    /* foreach (GameObject g in this.qizis)
-                     {
-                         Destroy(g);
-                     }
-                     qizi_num = 0;
-                     this.drawQiPan();*/
-
-
-            //Debug.Log("message is " + qipanInfo[1,1]);
+            
+            Debug.Log("message is " + Info.GetLength(0));
         }
 
 
