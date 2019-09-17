@@ -99,6 +99,7 @@ public class show_xiaqi : MonoBehaviour
                     xzs.Add(xz);
                 }
             }
+            xz_change = false;
         }
         if(change)
         {
@@ -129,6 +130,7 @@ public class show_xiaqi : MonoBehaviour
                     qizi.transform.position = new Vector3(i, 0.1f, j);
                 }
             }
+            change = false;
         }
         
         
@@ -185,7 +187,7 @@ public class show_xiaqi : MonoBehaviour
             }
             else
             {
-                this.xz_change = false;
+                //this.xz_change = false;
                 this.change = true;
                 qipanInfo = Info;
             }
