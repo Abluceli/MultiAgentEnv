@@ -155,7 +155,6 @@ MonoBehaviour:
   z: {fileID: 4188314808108969743, guid: 5f05ad27ab074b141a63ed29be1247c7, type: 3}
   main_camera: {fileID: 2139390114}
   plane: {fileID: 1212524107}
-  xz_rows: 45
 --- !u!4 &41507309
 Transform:
   m_ObjectHideFlags: 0
