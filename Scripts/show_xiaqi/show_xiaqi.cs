@@ -6,7 +6,7 @@ using System.Threading;
 using UnityEngine;
 using System.Runtime.Serialization.Json;
 //treelet
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 //treelet
 using System.Collections;
 using System.Collections.Generic;
@@ -175,7 +175,7 @@ public class show_xiaqi : MonoBehaviour
 
 
             //Treelet
-            int[,] Info = JsonConvert.DeserializeObject<int[,]>(message);
+            int[,] Info = null;//JsonConvert.DeserializeObject<int[,]>(message);
             //Treelet
 
             if (Info.GetLength(0) != this.xz_rows)
