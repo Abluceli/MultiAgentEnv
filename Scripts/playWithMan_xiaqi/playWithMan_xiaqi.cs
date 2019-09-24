@@ -82,6 +82,14 @@ public class playWithMan_xiaqi : MonoBehaviour
         {
             this.heiORbai = false;
         }
+        else if(this.steps%2 == 1)
+        {
+            this.heiORbai = false;
+        }
+        else if(this.steps%2 == 0)
+        {
+            this.heiORbai = false;
+        }
     }
 
     public void drawQiPan()
