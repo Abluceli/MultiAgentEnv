@@ -45,6 +45,7 @@ public class playWithMan_xiaqi : MonoBehaviour
 
     private bool heiORbai = true;
     private int steps = 0;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -61,35 +62,42 @@ public class playWithMan_xiaqi : MonoBehaviour
 
     }
 
-    public void step()
+    public void step(float x, float z)
     {
         GameObject qizi = null;
-        if (this.heiORbai)
+        if(this.steps == 0 && this.heiORbai)
         {
-            
             qizi = Instantiate(heiqi);
-            qizi.transform.position = new Vector3(this.transform.position.x, 0.1f, this.transform.position.z);
+            qizi.transform.position = new Vector3(x, 0.1f, z);
+            this.qizis.Add(qizi);
+            this.steps++;
+            this.heiORbai = false;
         }
-        else
+       else if(this.steps != 0 && this.heiORbai)
+        {
+            qizi = Instantiate(heiqi);
+            qizi.transform.position = new Vector3(x, 0.1f, z);
+            this.qizis.Add(qizi);
+            this.steps++;
+            if(this.steps == 3)
+            {
+                this.heiORbai = false;
+                this.steps = 1;
+            }
+        }
+        else if (this.steps != 0 && !this.heiORbai)
         {
             qizi = Instantiate(baiqi);
-            qizi.transform.position = new Vector3(this.transform.position.x, 0.1f, this.transform.position.z);
+            qizi.transform.position = new Vector3(x, 0.1f, z);
+            this.qizis.Add(qizi);
+            this.steps++;
+            if (this.steps == 3)
+            {
+                this.heiORbai = true;
+                this.steps = 1;
+            }
         }
-        this.qizis.Add(qizi);
-        this.steps++;
 
-        if(this.steps == 1)
-        {
-            this.heiORbai = false;
-        }
-        else if(this.steps%2 == 1)
-        {
-            this.heiORbai = false;
-        }
-        else if(this.steps%2 == 0)
-        {
-            this.heiORbai = false;
-        }
     }
 
     public void drawQiPan()

@@ -10,7 +10,7 @@ public class clickOBJ : MonoBehaviour
     public void clickEvent()
     {
         //GameObject qizi = null;
-        GameObject.Find("palyWithMan_xiaqi").GetComponent<playWithMan_xiaqi>().step();
+        GameObject.Find("palyWithMan_xiaqi").GetComponent<playWithMan_xiaqi>().step(this.transform.position.x, this.transform.position.z);
 
         
         
