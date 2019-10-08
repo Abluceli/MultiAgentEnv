@@ -45,11 +45,13 @@ public class playWithMan_xiaqi : MonoBehaviour
 
     private bool heiORbai = true;
     private int steps = 0;
-    
+
+    public GameObject playa;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        this.playa.SetActive(false);
         //this.startServer();
         //drawQiPan();
 
@@ -64,6 +66,8 @@ public class playWithMan_xiaqi : MonoBehaviour
 
     public void step(float x, float z)
     {
+        bool isEnd = false;
+        int win = 0;
         GameObject qizi = null;
         if(this.steps == 0 && this.heiORbai)
         {
@@ -72,6 +76,9 @@ public class playWithMan_xiaqi : MonoBehaviour
             this.qizis.Add(qizi);
             this.steps++;
             this.heiORbai = false;
+            this.qipanInfo[(int)x, (int)z] = -1;
+            isEnd = this.determine((int)x, (int)z, -1);
+            win = -1;
         }
        else if(this.steps != 0 && this.heiORbai)
         {
@@ -84,6 +91,9 @@ public class playWithMan_xiaqi : MonoBehaviour
                 this.heiORbai = false;
                 this.steps = 1;
             }
+            this.qipanInfo[(int)x, (int)z] = -1;
+            isEnd = this.determine((int)x, (int)z, -1);
+            win = -1;
         }
         else if (this.steps != 0 && !this.heiORbai)
         {
@@ -96,8 +106,39 @@ public class playWithMan_xiaqi : MonoBehaviour
                 this.heiORbai = true;
                 this.steps = 1;
             }
+            this.qipanInfo[(int)x, (int)z] = 1;
+            isEnd = this.determine((int)x, (int)z, 1);
+            win = 1;
         }
+        if(isEnd)
+        {
+            //Text message = GameObject.Find("Canvas").GetComponentInChildren<Text>();
+            Text messages = GameObject.Find("message").GetComponent<Text>();
+            if(win == -1)
+            {
+                messages.text = "游戏结束！黑方胜出！";
+                this.playa.SetActive(true);
+            }
+            else if(win == 1)
+            {
+                messages.text = "游戏结束！白方胜出！";
+                this.playa.SetActive(true);
+            }
 
+            
+        }
+    }
+
+    public void playagain()
+    {
+        Text messages = GameObject.Find("message").GetComponent<Text>();
+        messages.text = "";
+        this.playa.SetActive(false);
+        this.heiORbai = true;
+        this.steps = 0;
+        this.qipanInfo = new int[this.xz_rows, this.xz_rows];
+        this.xz_change = true;
+        this.drawQiPan();
     }
 
     public void drawQiPan()
@@ -173,29 +214,7 @@ public class playWithMan_xiaqi : MonoBehaviour
             {
                 DestroyImmediate(g);
             }
-            for (int i = 0; i < xz_rows; i++)
-            {
-                for (int j = 0; j < xz_rows; j++)
-                {
-                    GameObject qizi = null;
-                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 0)
-                    {
-                        qizi = Instantiate(heiqi);
-                        qizis.Add(qizi);
-
-                    }
-                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 1)
-                    {
-                        qizi = Instantiate(baiqi);
-                        qizis.Add(qizi);
-                    }
-                    if (System.Convert.ToInt32(qipanInfo.GetValue(i, j)) == 2)
-                    {
-                        continue;
-                    }
-                    qizi.transform.position = new Vector3(i, 0.1f, j);
-                }
-            }
+           
             change = false;
         }
 
@@ -279,11 +298,97 @@ public class playWithMan_xiaqi : MonoBehaviour
         //this.xz_rows = System.Convert.ToInt32(inputField.text);
         //Debug.Log(this.GetComponent<InputField>().text);
         this.xz_rows = System.Convert.ToInt32(inputField.text);
+        this.qipanInfo = new int[this.xz_rows, this.xz_rows];
         this.xz_change = true;
         this.drawQiPan();
 
 
     }
 
-    
+
+
+    //判断当前下的棋子是否结束游戏，x,y为下棋的位置,player为黑方或者白方（-1，1）
+    public bool determine(int x, int y, int player)
+    {
+        if (player != 0)
+        {
+            int[] DIRECTIONS_x = new int[3] { 1, -1, 0 };
+            int[] DIRECTIONS_y = new int[3] { 1, -1, 0 };
+            int nx, ny;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (i == 2 && j == 2)
+                    {
+                        continue;
+                    }
+                    nx = x + DIRECTIONS_x[i];
+                    ny = y + DIRECTIONS_y[j];
+                    if (is_outta_range(nx, ny))
+                    {
+                        continue;
+                    }
+                    if (this.qipanInfo[nx, ny] == player)
+                    {
+                        while (this.qipanInfo[nx, ny] == player)
+                        {
+                            nx = nx + DIRECTIONS_x[i];
+                            ny = ny + DIRECTIONS_y[j];
+                            if (is_outta_range(nx, ny))
+                            {
+                                break;
+                            }
+                        }
+
+                        nx = nx - DIRECTIONS_x[i];
+                        ny = ny - DIRECTIONS_y[j];
+
+                        bool is_end = _track(nx, ny, DIRECTIONS_x[i], DIRECTIONS_y[j]);
+
+                        if (is_end)
+                        {
+                            return true;
+                        }
+
+                    }
+                }
+
+            }
+
+            return false;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool _track(int start_x, int start_y, int v1, int v2)
+    {
+        int x = start_x;
+        int y = start_y;
+
+        int original_player = this.qipanInfo[x, y];
+
+        int step = 1;
+        while (true)
+        {
+            x = x - v1;
+            y = y - v2;
+            if (is_outta_range(x, y) || this.qipanInfo[x, y] != original_player)
+            {
+                if (step == 6)
+                {
+                    return true;
+                }
+                return false;
+            }
+            step += 1;
+        }
+    }
+    public bool is_outta_range(int nx, int ny)
+    {
+        return nx < 0 || nx >= this.qipanInfo.GetLength(0) || ny < 0 || ny >= this.qipanInfo.GetLength(1);
+    }
 }
